@@ -1,0 +1,96 @@
+
+  
+  .card-booking {
+    background: white;
+    border: none;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
+    display: flex;
+    height: 100%;
+    margin-bottom:10px;
+  }
+  
+  
+  .form-check {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    z-index: 10;
+   
+  }
+  
+  .form-check-input {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #6c757d;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .form-check-input:checked {
+    background-color: #007bff;
+    border-color: #007bff;
+  }
+  
+  .card-img-left {
+    width: 180px;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 12px;
+    margin: 15px;
+    flex-shrink: 0;
+  }
+  
+  .card-body {
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    flex-grow: 1;
+  }
+  
+  .card-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 10px;
+  }
+  
+  .card-text {
+    font-size: 0.95rem;
+    color: #555;
+    line-height: 1.6;
+    margin-bottom: 15px;
+  }
+
+  .btn-valider {
+    background:black;
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 25px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+    display: block;
+    margin: 20px auto;
+  }
+  
+  .btn-valider:hover {
+    background: rgba(209, 208, 121, 0.8) ;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(28, 28, 28, 0.4);
+  }
+  
+  .text-muted {
+    font-size: 1rem;
+    text-align: center;
+    margin-top: 30px;
+    color: #6c757d;
+  }
+

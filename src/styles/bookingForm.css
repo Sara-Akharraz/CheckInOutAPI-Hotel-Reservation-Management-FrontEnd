@@ -1,0 +1,50 @@
+
+.form-booking {
+    font-family:  BlinkMacSystemFont;
+    font-size:18px;
+    margin-top:10px;
+    margin-bottom: 2rem;
+    display: flex;
+    flex-direction:column;
+    align-items: center;
+    gap: 1rem;
+    /* background-color:pink; */
+    /* background-color:#fffde1; */
+    background-color:rgba(209, 208, 121, 0.6) ;
+    border-radius:20px;
+    padding:20px;
+    padding-buttom:25px;
+}
+.form-booking input {
+    margin-top:10px;
+    margin-left:20px;
+    padding: 0.8rem 1.2rem;
+    border-radius: 2rem;
+    border: none;
+    outline: none;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    width: 300px;
+    transition: all 0.3s ease;
+}
+
+.form-booking input:focus {
+    box-shadow: 0 2px 15px rgba(122, 240, 207, 0.3);
+}
+
+.form-booking button {
+    padding: 0.8rem 1.5rem;
+    background-color: #252525;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 2rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 15px 70px rgba(255, 255, 255, 0.2);
+}
+
+.form-booking button:hover {
+    background-color: rgba(209, 208, 121, 0.8) ;
+    transform: translateY(-2px);
+    /* box-shadow: 0 4px 15px rgba(78, 205, 196, 0.4); */
+}
