@@ -1,0 +1,30 @@
+
+:root {
+    /* Base Colors */
+    --color-white: #FFFFFF;
+    --color-black: #2C3E50;
+    --color-dark-bg: #1A1A1A; /* For dark mode background */
+  
+    /* Primary Colors */
+    --color-blue: #4A89DC;
+    --color-green: #48CFAD;
+    --color-red: #E9573F;
+    --color-purple: #967ADC;
+  
+    /* Optional: Lighter/Darker variants */
+    --color-blue-light: rgba(74, 137, 220, 0.1);
+    --color-green-light: rgba(72, 207, 173, 0.1);
+    --color-red-light: rgba(233, 87, 63, 0.1);
+    --color-purple-light: rgba(150, 122, 220, 0.1);
+  }
+
+.content{
+    background-color: #eee;
+    margin-left: 50px;
+    margin-top: 60px;
+    position: relative;
+    color: var(--color-dark-bg);
+    z-index: 1;
+    padding: 30px;
+    border-top-left-radius: 50px;
+}
