@@ -7,7 +7,7 @@ import axios from "axios";
 import Header from "../components/Header";
 import SidebarNavClient from "../components/SideBarClient";
 import StripeForm from "../components/StripeForm";
-
+import{ useAuth } from '../components/AuthContext';
 import "../styles/FactureSuivi.css";
 import "../styles/bookingForm.css";
 import "../styles/bootstrap-tables-only.css";
@@ -20,11 +20,17 @@ const Paiement = () => {
   const [paiementEffectue, setPaiementEffectue] = useState(false);
   const [message, setMessage] = useState("");
   const [method, setMethod] = useState("STRIPE");
-
+const { user, token } = useAuth();
   useEffect(() => {
     
     axios
-      .get(`/api/facture/Montant_checkin`, {
+      .get(`/api/facture/Montant_checkin`,
+         {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                  'Content-Type': 'application/json'
+                }
+               ,
         params: { id_reservation: reservationId },
       })
       .then((res) => setMontant(res.data))
@@ -39,7 +45,11 @@ const Paiement = () => {
     }
 
     axios
-      .post(`/api/check_in/validerCheckIn`, null, {
+      .post(`/api/check_in/validerCheckIn`,null, {
+        headers: {
+                  Authorization: `Bearer ${token}`,
+                  'Content-Type': 'application/json'
+                },
         params: { reservationId } 
       })
       .then((res) => {

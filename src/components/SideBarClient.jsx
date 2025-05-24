@@ -1,23 +1,27 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation ,useNavigate} from 'react-router-dom';
 import { FaUser, FaSignOutAlt } from 'react-icons/fa';
 import { RiCoinsFill, RiCalendarScheduleFill } from "react-icons/ri";
 import { TfiKey } from "react-icons/tfi";
 import { BiRestaurant } from "react-icons/bi";
 import '../styles/SideBar.css';
+import { useAuth } from './AuthContext';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const SidebarNavClient = () => {
   const location = useLocation();
   const [activeButton, setActiveButton] = useState('');
-
+  const {user:authUser,logout}=useAuth();
+  const navigate =useNavigate();
   useEffect(() => {
    
     if (location.pathname.startsWith('/booking')) setActiveButton('booking');
     else if (location.pathname.startsWith('/mes-reservations')) setActiveButton('reservations');
     else if (location.pathname.startsWith('/suivi-service')) setActiveButton('services');
     else if (location.pathname.startsWith('/suivi-facture')) setActiveButton('facture');
-    else if (location.pathname.startsWith('/profile')) setActiveButton('profile');
-    else if (location.pathname.startsWith('/logout')) setActiveButton('logout');
+    else if (location.pathname.startsWith('../UserProfile')) setActiveButton('profile');
+    // else if (location.pathname.startsWith('/logout')) setActiveButton('logout');
     else setActiveButton(''); 
   }, [location.pathname]);
 
@@ -37,7 +41,7 @@ const SidebarNavClient = () => {
           </button>
         </Link>
 
-        <Link to="/mes-reservations/2">
+        <Link to="/mes-reservations">
           <button
             className={activeButton === 'reservations' ? 'active' : ''}
             onClick={() => handleButtonClick('reservations')}
@@ -46,7 +50,7 @@ const SidebarNavClient = () => {
           </button>
         </Link>
 
-        <Link to="/suivi-service/2">
+        <Link to="/suivi-service">
           <button
             className={activeButton === 'services' ? 'active' : ''}
             onClick={() => handleButtonClick('services')}
@@ -55,7 +59,7 @@ const SidebarNavClient = () => {
           </button>
         </Link>
 
-        <Link to="/suivi-facture/2">
+        <Link to="/suivi-facture">
           <button
             className={activeButton === 'facture' ? 'active' : ''}
             onClick={() => handleButtonClick('facture')}
@@ -66,7 +70,7 @@ const SidebarNavClient = () => {
       </nav>
 
       <div className="bottom-icons">
-        <Link to="/profile">
+        <Link to="../UserProfile">
           <button
             className={activeButton === 'profile' ? 'active' : ''}
             onClick={() => handleButtonClick('profile')}
@@ -77,7 +81,23 @@ const SidebarNavClient = () => {
         <Link to="/logout">
           <button
             className={`logout ${activeButton === 'logout' ? 'active' : ''}`}
-            onClick={() => handleButtonClick('logout')}
+            onClick={async () => {
+                try {
+                  await logout(); 
+                  navigate('../login');
+                } catch (error) {
+                  console.error('Logout failed:', error);
+                  toast.error("Déconnexion échoue, essayer une autre fois", {
+                                  position: "top-center",
+                                  autoClose: 5000,
+                                  hideProgressBar: false,
+                                  closeOnClick: true,
+                                  pauseOnHover: true,
+                                  draggable: true,
+                                  theme: "light"
+                              });
+                }
+              }}
           >
             <FaSignOutAlt />
           </button>

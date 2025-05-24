@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
 import "../styles/bootstrap-tables-only.css";
 import "../styles/FactureSuivi.css";
-
+import{ useAuth } from '../components/AuthContext';
 
 const ReservationForm = ({ onReservationComplete }) => {
-  const [userId, setUserId] = useState("");
+  // const [userId, setUserId] = useState("");
   const [reservationData, setReservationData] = useState(null);
   const [resultMessage, setResultMessage] = useState("");
-
+  const { user, token } = useAuth();
   useEffect(() => {
     const data = JSON.parse(sessionStorage.getItem("reservationData"));
 
@@ -26,7 +26,7 @@ const ReservationForm = ({ onReservationComplete }) => {
 
     const dataToSend = {
       reservationDTO: {
-        userId: parseInt(userId),
+        userId: parseInt(user.id),
         date_debut: dateDebut,
         date_fin: dateFin,
         status: "En_Attente",
@@ -38,6 +38,7 @@ const ReservationForm = ({ onReservationComplete }) => {
       const response = await fetch("/api/reservation", {
         method: "POST",
         headers: {
+           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify(dataToSend),
@@ -70,8 +71,8 @@ const ReservationForm = ({ onReservationComplete }) => {
           type="number"
           id="userId"
           className="form-control"
-          value={userId}
-          onChange={(e) => setUserId(e.target.value)}
+          value={user.id}
+          // onChange={(e) => setUserId(e.target.value)}
           required
         />
       </div>

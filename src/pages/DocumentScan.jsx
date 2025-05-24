@@ -5,7 +5,7 @@ import SidebarNavClient from '../components/SideBarClient';
 import '../styles/FactureSuivi.css';
 import '../styles/bookingForm.css';
 import '../styles/bootstrap-tables-only.css';
-
+import{ useAuth } from '../components/AuthContext';
 function DocumentScan() {
   const { reservationId } = useParams();
   const navigate = useNavigate();
@@ -16,7 +16,7 @@ function DocumentScan() {
   const [loading, setLoading] = useState(false);
   const [validationReussie, setValidationReussie] = useState(false);
   const [message, setMessage] = useState('');
-
+  const { user, token } = useAuth();
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file.size > 5 * 1024 * 1024) {
@@ -69,7 +69,13 @@ function DocumentScan() {
       formData.append('cin', data.cin);
       formData.append('type', 'CIN');
 
-      const response = await fetch(`/api/check_in/validerScan?reservationId=${reservationId}`, {
+      const response = await fetch(`/api/check_in/validerScan?reservationId=${reservationId}`, 
+        {
+          
+      headers: {
+        Authorization: `Bearer ${token}`,
+      
+       },
         method: 'POST',
         body: formData,
       });

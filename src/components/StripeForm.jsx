@@ -1,16 +1,22 @@
 import React, { useEffect, useState } from "react";
 import { useStripe, useElements, CardElement } from "@stripe/react-stripe-js";
 import axios from "axios";
-
+import{ useAuth } from '../components/AuthContext';
 const StripeForm = ({ montantMAD, reservationId, method, setMessage, setPaiementEffectue }) => {
   const stripe = useStripe();
   const elements = useElements();
   const [clientSecret, setClientSecret] = useState(null);
   const [loading, setLoading] = useState(false);
-
+  const { user, token } = useAuth();
   useEffect(() => {
     if (montantMAD !== null) {
-      axios.post("/api/facture/create-intent", { amount: montantMAD })
+      axios.post("http://localhost:8080/api/facture/create-intent",
+        { amount: montantMAD },
+      {  headers: {
+                  Authorization: `Bearer ${token}`
+                
+                }}
+         )
         .then(res => {
           console.log("Client Secret reçu :", res.data);
           setClientSecret(res.data.clientSecret);

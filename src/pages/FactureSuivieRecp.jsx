@@ -4,17 +4,22 @@ import '../styles/FactureSuivi.css';
 import Header from '../components/Header';
 import { CiInboxIn } from 'react-icons/ci';
 import '../styles/bootstrap-tables-only.css';
-
+import {useAuth} from '../components/AuthContext';
 const SuiviFacture = () => {
   const [reservationId, setReservationId] = useState('');
   const [factures, setFactures] = useState([]);
   const [errorMessage, setErrorMessage] = useState('');
-
+  const {user,token}=useAuth();
   const fetchFactures = async () => {
     if (!reservationId) return;
 
     try {
-      const response = await fetch(`/api/facture/facturescheckin/${reservationId}`);
+      const response = await fetch(`/api/facture/factures/${reservationId}`,
+       {  headers: {
+        Authorization: `Bearer ${token}`,
+      
+       }}
+      );
       if (response.ok) {
         const facturesData = await response.json();
         setFactures(facturesData);
@@ -35,8 +40,19 @@ const SuiviFacture = () => {
     fetchFactures();
   };
 
-  const handleOpenFactureInBrowser = (factureId) => {
-    window.open(`http://localhost:8080/api/facture/checkinfacture/${factureId}`, '_blank');
+  // const handleOpenFactureInBrowser = (factureId) => {
+  //   window.open(`http://localhost:8080/api/facture/checkinfacture/${factureId}`, '_blank');
+  // };
+
+   const handleOpenFactureInBrowser = async (factureId) => {
+    const res = await fetch(`http://localhost:8080/api/facture/checkinfacture/${factureId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      }
+    });
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    window.open(url, '_blank');
   };
 
   return (
@@ -70,6 +86,7 @@ const SuiviFacture = () => {
                   <tr>
                     <th>ID Facture</th>
                     <th>Montant Check-in</th>
+                    <th>Montant Check-out</th>
                     <th>Taxe</th>
                     <th>Statut</th>
                     <th>Actions</th>
@@ -80,6 +97,7 @@ const SuiviFacture = () => {
                     <tr key={facture.id}>
                       <td>{facture.id}</td>
                       <td>{facture.checkInMontant} DH</td>
+                      <td>{facture.checkOutMontant} DH</td>
                       <td>{facture.tax} DH</td>
                       <td>
                         {facture.status === 'paye' ? (

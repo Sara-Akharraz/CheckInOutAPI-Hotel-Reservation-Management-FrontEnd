@@ -9,16 +9,23 @@ import "../styles/bookingPage.css";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import "../styles/Slider.css";
-
+import{ useAuth } from '../components/AuthContext';
 const ChambreDetail = () => {
   const { chambreId } = useParams();
   const [chambre, setChambre] = useState(null);
   const [loading, setLoading] = useState(true);
-
+  const { user, token } = useAuth();
   useEffect(() => {
     const fetchChambreDetail = async () => {
       try {
-        const response = await fetch(`/api/chambres/${chambreId}`);
+        const response = await fetch(`/api/chambre/${chambreId}`,
+            {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                  'Content-Type': 'application/json'
+                }
+              }
+        );
         const data = await response.json();
         setChambre(data);
         setLoading(false);

@@ -1,4 +1,5 @@
-import React from 'react';
+import React  from 'react';
+import { Link,useNavigate} from 'react-router-dom';
 import '../styles/Header.css';
 import { FaBell } from 'react-icons/fa';
 import { FaUserCircle } from 'react-icons/fa';
@@ -6,6 +7,13 @@ import { FaUserCircle } from 'react-icons/fa';
 import NotificationBell from '../components/NotificationBell';
 
 const Header = () => {
+    const navigate =useNavigate();
+
+
+  const handleButtonClick = () => {
+    navigate('../UserProfile');
+  };
+
   return (
     <header className="header">
       <div className="logo">
@@ -16,7 +24,7 @@ const Header = () => {
           <FaBell className="icon" />
         </button> */}
         <NotificationBell/>
-        <button className="icon-btn">
+        <button className="icon-btn" onClick={() => handleButtonClick()}>
 
           <FaUserCircle className="icon" />
         </button>

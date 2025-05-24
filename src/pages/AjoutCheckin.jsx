@@ -5,7 +5,7 @@ import Header from '../components/Header';
 import SidebarNav from '../components/SideBar';
 import '../styles/bootstrap-tables-only.css';
 import '../styles/FactureSuivi.css';
-
+import {useAuth} from '../components/AuthContext';
 const AjoutCheckin = () => {
   const { id_reservation } = useParams();
   const navigate = useNavigate();
@@ -20,13 +20,24 @@ const AjoutCheckin = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState(null);
-
+  const {token}=useAuth()
   useEffect(() => {
-    axios.get(`/api/facture/Montant_checkin`, { params: { id_reservation } })
+    axios.get(`/api/facture/Montant_checkin`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      
+       }, params: { id_reservation } })
       .then((res) => setMontant(res.data))
       .catch(() => setError('Erreur lors du chargement du montant'));
 
-    axios.get(`/api/reservation/userinfo/${id_reservation}`)
+    axios.get(`/api/reservation/userinfo/${id_reservation}`,
+      {
+          
+      headers: {
+        Authorization: `Bearer ${token}`,
+      
+       }}
+    )
       .then((res) => setUser(res.data))
       .catch(() => setError("Erreur lors du chargement des informations de l'utilisateur"));
   }, [id_reservation]);
@@ -40,7 +51,9 @@ const AjoutCheckin = () => {
 
     try {
       const response = await axios.post('/api/check_in/extract-info', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
+        headers: { 
+           Authorization: `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data' }
       });
 
       const { nom: extractedNom, prenom: extractedPrenom, cin: extractedCin } = response.data;
@@ -99,7 +112,9 @@ const AjoutCheckin = () => {
 
     try {
       await axios.post("/api/check_in/ajoutercheckin", formData, {
-        headers: { "Content-Type": "multipart/form-data" }
+        headers: { 
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data" }
       });
       navigate("/checkin");
     } catch (err) {

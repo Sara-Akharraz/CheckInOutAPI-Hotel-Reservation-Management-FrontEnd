@@ -5,18 +5,23 @@ import Header from '../components/Header';
 import SidebarNav from '../components/SideBar';
 import '../styles/bootstrap-tables-only.css';
 import '../styles/FactureSuivi.css'; 
-
+import {useAuth} from '../components/AuthContext';
 const DetailReservation = () => {
   const { id: idFromURL } = useParams();
   const [reservationId, setReservationId] = useState(idFromURL || '');
   const [reservationDetails, setReservationDetails] = useState(null);
   const [error, setError] = useState('');
-
+  const {user,token} =useAuth();
   const fetchReservationDetails = async () => {
     if (!reservationId) return;
 
     try {
-      const response = await axios.get(`/api/reservation/details/${reservationId}`);
+      const response = await axios.get(`/api/reservation/details/${reservationId}`,
+       {  headers: {
+           Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        }}
+      );
       setReservationDetails(response.data);
       setError('');
     } catch (err) {

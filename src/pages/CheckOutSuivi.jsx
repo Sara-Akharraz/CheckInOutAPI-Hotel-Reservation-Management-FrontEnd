@@ -7,13 +7,13 @@ import '../styles/FactureSuivi.css';
 import '../styles/bootstrap-tables-only.css';
 import { CiInboxIn } from 'react-icons/ci';
 import{ useAuth } from '../components/AuthContext';
-const CheckinSuivie = () => {
+const CheckOutSuivie = () => {
   const [reservationId, setReservationId] = useState('');
   const [checkinDetails, setCheckinDetails] = useState(null);
   const [montantCheckin, setMontantCheckin] = useState(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [checkinStatus, setCheckinStatus] = useState('');
+  const [checkincheckOutStatut, setCheckinStatus] = useState('');
   const navigate = useNavigate();
 const { user, token } = useAuth();
   const fetchCheckinDetails = async () => {
@@ -25,7 +25,7 @@ const { user, token } = useAuth();
     setLoading(true);
     setError('');
     try {
-      const response = await axios.get(`/api/check_in/reservation/${reservationId}`,
+      const response = await axios.get(`/api/checkout/reservation/${reservationId}`,
          
          
      { headers: {
@@ -36,14 +36,14 @@ const { user, token } = useAuth();
 
       if (typeof response.data === 'string' && response.data.includes('non encore effectué')) {
         setCheckinStatus('non_effectue');
-        setCheckinDetails(null);
+      
         setMontantCheckin(null);
         setError('');
       } else {
         setCheckinDetails(response.data);
         setCheckinStatus('effectue');
 
-        const montantRes = await axios.get(`/api/facture/Montant_checkin`, {
+        const montantRes = await axios.get(`/api/facture/Montant_checkOut`, {
           
       headers: {
         Authorization: `Bearer ${token}`,
@@ -69,51 +69,38 @@ const { user, token } = useAuth();
     }
   };
 
-  const openDocumentScan = async() => {
-    if (checkinDetails?.id_documentScan) {
-      const documentUrl = `http://localhost:8080/api/mock_documents/preview/${checkinDetails.id_documentScan}`;
-       const res = await fetch(documentUrl, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      }
-    });
-    const blob = await res.blob();
-    const url = URL.createObjectURL(blob);
-    window.open(url, '_blank');
-      
-    }
-  };
+ 
 
   const handleValidateCheckin = async () => {
-    if (checkinDetails?.status.toLowerCase() === 'en_attente') {
+    if (checkinDetails?.checkOutStatut.toLowerCase() === 'en_attente') {
       try {
-        await axios.post(`/api/check_in/validercheckinreception`, null, 
+        await axios.post(`/api/checkout/validate-payment/${checkinDetails.id}`, 
            {
           
       headers: {
         Authorization: `Bearer ${token}`,
       
-       },
-          params: { id_checkin: checkinDetails.id }
-        });
+       }});
         setCheckinDetails({
           ...checkinDetails,
-          status: 'validé',
+          checkOutStatut: 'confirmee',
         });
       } catch (err) {
-        setError('Erreur lors de la validation du check-in.');
+        setError('Erreur lors de la validation du check-Out.');
       }
     }
   };
 
   const handleAddCheckin = () => {
-    navigate(`/ajoutcheckin/${reservationId}`,
-       {
-          
-      headers: {
-        Authorization: `Bearer ${token}`,
-      
-       }}
+    navigate(`/api/checkout`,
+         {
+                 method: "POST",
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({id_reservation:reservationId})
+              }
     );
   };
 
@@ -123,7 +110,7 @@ const { user, token } = useAuth();
       <div className="right-side">
         <SidebarNav />
         <div className="content flex-grow-1 p-4">
-          <h1 className="fs-4 fw-bold mb-4">Suivi du Check-in</h1>
+          <h1 className="fs-4 fw-bold mb-4">Suivi du Check-Out</h1>
 
           <form onSubmit={(e) => { e.preventDefault(); fetchCheckinDetails(); }} className="form">
             <div>
@@ -134,24 +121,24 @@ const { user, token } = useAuth();
                 onChange={(e) => setReservationId(e.target.value)}
               />
             </div>
-            <button type="submit">Voir le check-in</button>
+            <button type="submit">Voir le check-Out</button>
           </form>
 
           {loading && <p>Chargement...</p>}
           {error && <p className="text-danger fw-semibold mb-3">{error}</p>}
 
-          {checkinStatus === 'non_effectue' && (
+          {checkincheckOutStatut === 'non_effectue' && (
             <div className="alert alert-warning mt-3">
-              <p className="mb-2">Check-in non encore effectué pour cette réservation.</p>
-              <button onClick={handleAddCheckin} className="btn-valider">
-                Ajouter Check-in
-              </button>
+              <p className="mb-2">Check-out non encore effectué pour cette réservation.</p>
+           <button onClick={handleAddCheckin} className=" btn-valider">
+                  Effectuer Check-Out
+            </button>
             </div>
           )}
 
           {checkinDetails && (
             <div className="table-responsive mt-4">
-              <h2 className="table-title">Détails du Check-in</h2>
+              <h2 className="table-title">Détails du Check-Out</h2>
               <table className="table table-bordered">
                 <tbody>
                   <tr>
@@ -159,13 +146,14 @@ const { user, token } = useAuth();
                     <td>{checkinDetails.id_reservation}</td>
                   </tr>
                   <tr>
-                    <th>Date Check-in</th>
-                    <td>{checkinDetails.dateCheckIn}</td>
+                    <th>Date Check-Out</th>
+                    <td>{checkinDetails.dateCheckOut}</td>
                   </tr>
+                 
                   <tr>
                     <th>Statut</th>
                     <td>
-                      {checkinDetails.status.toLowerCase() === 'validé' ? (
+                      {checkinDetails.checkOutStatut.toLowerCase() === 'confirmee' ? (
                         <span className="badge custom-validé">Validé</span>
                       ) : (
                         <span className="badge custom-en-attente">En attente</span>
@@ -178,7 +166,7 @@ const { user, token } = useAuth();
                       <td>{montantCheckin.toFixed(2)} MAD</td>
                     </tr>
                   )}
-                  {checkinDetails.id_documentScan && (
+                  {/* {checkinDetails.id_documentScan && (
                     <tr>
                       <th>Document</th>
                       <td>
@@ -187,8 +175,8 @@ const { user, token } = useAuth();
                         </button>
                       </td>
                     </tr>
-                  )}
-                  {checkinDetails.status.toLowerCase() === 'en_attente' && (
+                  )} */}
+                  {checkinDetails.checkOutStatut.toLowerCase() === 'en_attente' && (
                     <tr>
                       <th>Action</th>
                       <td>
@@ -208,4 +196,4 @@ const { user, token } = useAuth();
   );
 };
 
-export default CheckinSuivie;
+export default CheckOutSuivie;

@@ -10,29 +10,34 @@ import { TfiKey } from 'react-icons/tfi';
 import { RiDoorOpenFill } from 'react-icons/ri';
 import { VscOutput } from 'react-icons/vsc';
 import { useNavigate } from 'react-router-dom';
-
+import {useAuth} from '../components/AuthContext';
 import ReactClock from 'react-clock'; 
 
-const Dashboard = () => {
+const DashboardRecep = () => {
   const [stats, setStats] = useState({ reservations: 0, checkins: 0, checkouts: 0 });
   const [weather, setWeather] = useState(null);
-  const [user, setUser] = useState({ nom: '', prenom: '' });
+  // const [user, setUser] = useState({ nom: '', prenom: '' });
   const navigate = useNavigate();
   const [value, setValue] = useState(new Date());
-
+  const {user,token} =useAuth();
   useEffect(() => {
     const interval = setInterval(() => setValue(new Date()), 1000);
     return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {
-    axios.get('/api/reservation/stats')
+    axios.get('/api/reservation/stats',
+       {  headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json"
+       }}
+    )
       .then(res => setStats(res.data))
       .catch(err => console.error(err));
 
-    axios.get('/api/user/profile')
-      .then(res => setUser(res.data))
-      .catch(err => console.error(err));
+    // axios.get('/api/user/profile')
+    //   .then(res => setUser(res.data))
+    //   .catch(err => console.error(err));
 
     const API_KEY = process.env.REACT_APP_WEATHER_API_KEY;
     const city = 'Agadir';
@@ -117,4 +122,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+export default DashboardRecep;

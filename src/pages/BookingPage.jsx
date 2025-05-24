@@ -7,15 +7,22 @@ import "../styles/FactureSuivi.css";
 import "../styles/bookingPage.css";
 import SidebarNavClient from "../components/SideBarClient";
 import { BiPointer } from "react-icons/bi";
-
+import{ useAuth } from '../components/AuthContext';
 const BookingPage = () => {
   const [types, setTypes] = useState([]);
   const [chambres, setChambres] = useState([]);
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useState(null);
-
+  const { user, token } = useAuth();
   useEffect(() => {
-    fetch("/api/chambres/types")
+    fetch("/api/chambres/types",
+        {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                  'Content-Type': 'application/json'
+                }
+              }
+    )
       .then((res) => res.json())
       .then((data) => setTypes(data))
       .catch((err) => console.error("Erreur chargement types:", err));
@@ -27,7 +34,14 @@ const BookingPage = () => {
     const { dateDebut, dateFin, capacite, type, etage } = formData;
     const url = `/api/chambres/disponibles/filtre?dateDebut=${dateDebut}&dateFin=${dateFin}&capacite=${capacite}&type=${type}&etage=${etage}`;
 
-    fetch(url)
+    fetch(url,
+        {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                  'Content-Type': 'application/json'
+                }
+              }
+    )
       .then((res) => res.json())
       .then((data) => setChambres(data))
       .catch((err) => console.error("Erreur recherche chambres :", err));

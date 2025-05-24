@@ -5,12 +5,16 @@ import { RxDashboard } from "react-icons/rx";
 import { RiCoinsFill, RiDoorOpenFill } from "react-icons/ri";
 import { TfiKey } from "react-icons/tfi";
 import { VscOutput } from "react-icons/vsc";
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation ,useNavigate} from 'react-router-dom';
+import { useAuth } from './AuthContext';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const SidebarNav = () => {
   const location = useLocation();
   const [activeButton, setActiveButton] = useState(''); 
-
+    const {user:authUser,logout}=useAuth();
+    const navigate=useNavigate();
   useEffect(() => {
    
     if (!activeButton) {
@@ -18,9 +22,10 @@ const SidebarNav = () => {
       else if (location.pathname.startsWith('/reservations')) setActiveButton('reservations');
       else if (location.pathname.startsWith('/reservationDetail')) setActiveButton('reservationDetail');
       else if (location.pathname.startsWith('/checkin')) setActiveButton('checkin');
+      else if (location.pathname.startsWith('/checkOut')) setActiveButton('checkOut');
       else if (location.pathname.startsWith('/suivi-facture-recep')) setActiveButton('suiviFacture');
-      else if (location.pathname.startsWith('/profile')) setActiveButton('profile');
-      else if (location.pathname.startsWith('/logout')) setActiveButton('logout');
+        else if (location.pathname.startsWith('../UserProfile')) setActiveButton('profile');
+      // else if (location.pathname.startsWith('/logout')) setActiveButton('logout');
       else setActiveButton('');
     }
   }, [location.pathname, activeButton]);
@@ -67,6 +72,14 @@ const SidebarNav = () => {
             <RiDoorOpenFill />
           </button>
         </Link>
+        <Link to="/checkOut">
+          <button
+            className={activeButton === 'checkOut' ? 'active' : ''}
+            onClick={() => handleButtonClick('checkOut')}
+          >
+            <RiDoorOpenFill />
+          </button>
+        </Link>
 
         <Link to="/suivi-facture-recep">
           <button
@@ -79,7 +92,7 @@ const SidebarNav = () => {
       </nav>
 
       <div className="bottom-icons">
-        <Link to="/profile">
+        <Link to="../UserProfile">
           <button
             className={activeButton === 'profile' ? 'active' : ''}
             onClick={() => handleButtonClick('profile')}
@@ -87,10 +100,26 @@ const SidebarNav = () => {
             <FaUser />
           </button>
         </Link>
-        <Link to="/logout">
+        <Link to="/login">
           <button
             className={`logout ${activeButton === 'logout' ? 'active' : ''}`}
-            onClick={() => handleButtonClick('logout')}
+             onClick={async () => {
+                            try {
+                              await logout(); 
+                              navigate('../login');
+                            } catch (error) {
+                              console.error('Logout failed:', error);
+                              toast.error("Déconnexion échoue, essayer une autre fois", {
+                                              position: "top-center",
+                                              autoClose: 5000,
+                                              hideProgressBar: false,
+                                              closeOnClick: true,
+                                              pauseOnHover: true,
+                                              draggable: true,
+                                              theme: "light"
+                                          });
+                            }
+                          }}
           >
             <FaSignOutAlt />
           </button>

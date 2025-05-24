@@ -1,14 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import '../styles/ajoutService.css'; 
-
+import{ useAuth } from '../components/AuthContext';
 const ServiceSelector = ({ reservationId }) => {
   const [services, setServices] = useState([]);
   const [selectedServices, setSelectedServices] = useState([]);
   const [message, setMessage] = useState('');
   const [servicesValidated, setServicesValidated] = useState(false);
-
+  const { user, token } = useAuth();
   useEffect(() => {
-    fetch('/api/services')
+    fetch('/api/services', { headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        }})
       .then((res) => res.json())
       .then((data) => setServices(data))
       .catch((err) => {
@@ -22,6 +25,7 @@ const ServiceSelector = ({ reservationId }) => {
       const response = await fetch(`/api/reservation-services/addService?id_reservation=${reservationId}`, {
         method: 'POST',
         headers: {
+          Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(selectedServices),

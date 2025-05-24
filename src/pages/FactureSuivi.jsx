@@ -1,26 +1,34 @@
 import React, { useState, useEffect } from 'react';
+import {userParams} from 'react-router-dom';
 import Header from '../components/Header';
 import '../styles/FactureSuivi.css';
 import '../styles/bootstrap-tables-only.css';
 import { CiInboxIn } from 'react-icons/ci';
 import SidebarNavClient from '../components/SideBarClient';
-
+import{ useAuth } from '../components/AuthContext';
 const SuiviFacture = () => {
   const [reservationId, setReservationId] = useState('');
-  const [userId, setUserId] = useState('');
+  // const [user.id, setUserId] = useState('');
   const [factures, setFactures] = useState([]);
   const [errorMessage, setErrorMessage] = useState('');
+  const { user, token } = useAuth();
+  // useEffect(() => {
+  //   const userIdFromUrl = window.location.pathname.split('/')[2];
+  //   // setUserId(userIdFromUrl);
+  // }, []);
 
-  useEffect(() => {
-    const userIdFromUrl = window.location.pathname.split('/')[2];
-    setUserId(userIdFromUrl);
-  }, []);
-
-  const fetchFactures = async () => {
-    if (!reservationId || !userId) return;
+  const fetchFacturesCheckin = async () => {
+    if (!reservationId || !user.id) return;
 
     try {
-      const response = await fetch(`/api/facture/facturescheckin/${reservationId}/${userId}`);
+      const response = await fetch(`/api/facture/factures/${reservationId}/${user.id}`,
+         {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                  'Content-Type': 'application/json'
+                }
+              }
+      );
       if (response.ok) {
         const facturesData = await response.json();
         setFactures(facturesData);
@@ -38,12 +46,26 @@ const SuiviFacture = () => {
 
   const handleReservationIdSubmit = (e) => {
     e.preventDefault();
-    fetchFactures();
+    fetchFacturesCheckin();
   };
 
-  const handleOpenFactureInBrowser = (factureId) => {
-    window.open(`http://localhost:8080/api/facture/checkinfacture/${factureId}`, '_blank');
+  // const handleOpenFactureInBrowser = (factureId) => {
+  //   window.open(`http://localhost:8080/api/facture/checkinfacture/${factureId}?`,
+  //     '_blank');
+  // };
+
+
+  const handleOpenFactureInBrowser = async (factureId) => {
+    const res = await fetch(`http://localhost:8080/api/facture/checkinfacture/${factureId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      }
+    });
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    window.open(url, '_blank');
   };
+  
 
   return (
     <div className="container">
@@ -70,6 +92,7 @@ const SuiviFacture = () => {
           )}
 
           {!errorMessage && factures.length > 0 && (
+
             <div className="table-responsive">
               <h2 className="table-title">Check-in Facture</h2>
               <table className="table table-hover">
@@ -77,6 +100,7 @@ const SuiviFacture = () => {
                   <tr>
                     <th>ID Facture</th>
                     <th>Montant Check-in</th>
+                    <th>Montant Check-out</th>
                     <th>Taxe</th>
                     <th>Statut</th>
                     <th>Actions</th>
@@ -87,6 +111,7 @@ const SuiviFacture = () => {
                     <tr key={facture.id}>
                       <td>{facture.id}</td>
                       <td>{facture.checkInMontant} DH</td>
+                      <td>{facture.checkOutMontant} DH</td>
                       <td>{facture.tax} DH</td>
                       <td>
                         {facture.status === 'paye' ? (

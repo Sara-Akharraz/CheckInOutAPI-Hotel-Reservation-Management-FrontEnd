@@ -5,7 +5,7 @@ import Header from '../components/Header';
 import '../styles/FactureSuivi.css';
 import '../styles/bootstrap-tables-only.css';
 import { BiPointer } from "react-icons/bi";
-
+import {useAuth} from "../components/AuthContext";
 const Reservations = () => {
   const [reservations, setReservations] = useState([]);
   const [search, setSearch] = useState('');
@@ -13,7 +13,7 @@ const Reservations = () => {
   const [dateFin, setDateFin] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-
+  const {user,token}=useAuth();
   const fetchReservations = useCallback(async () => {
     let url = '/api/reservation/search';
     const params = [];
@@ -28,7 +28,11 @@ const Reservations = () => {
     }
 
     try {
-      const response = await fetch(url);
+      const response = await fetch(url,
+         {headers: {
+           Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        }});
       if (!response.ok) throw new Error('Erreur serveur');
 
       const data = await response.json();

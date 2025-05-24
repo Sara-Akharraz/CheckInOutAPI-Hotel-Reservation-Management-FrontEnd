@@ -3,9 +3,9 @@ import ReservationCard from '../components/ReservationCard';
 import { useNavigate, useParams } from 'react-router-dom';
 import SidebarNavClient from '../components/SideBarClient';
 import Header from '../components/Header';
-
+import{ useAuth } from '../components/AuthContext';
 const ReservationSuivi = () => {
-    const { userId } = useParams();
+    const { user, token } = useAuth();
     const [reservations, setReservations] = useState([]);
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(false);
@@ -13,16 +13,25 @@ const ReservationSuivi = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        if (userId) {
+        
+        if (user.id) {
             setLoading(true);
             setError(null);
             setNoDataMsg('');
-
-            fetch(`/api/reservation/reservations/user/${userId}`)
+console.log(user);
+            fetch(`/api/reservation/reservations/user/${user.id}`,
+                 {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                  'Content-Type': 'application/json'
+                }
+              }
+            )
                 .then(res => {
                     if (!res.ok) {
                         throw new Error('Erreur lors de la récupération des données');
                     }
+                    
                     return res.json();
                 })
                 .then(data => {
@@ -41,15 +50,31 @@ const ReservationSuivi = () => {
                     setNoDataMsg('');
                 });
         }
-    }, [userId]);
+    }, [user.id]);
 
     const handleCheckIn = (id) => {
         console.log(`Check-in pour la réservation ${id}`);
         navigate(`/check-in/${id}`);
     };
 
-    const handleCheckOut = (id) => {
+    const handleCheckOut =async (id) => {
+        const res=await fetch(`/api/checkout`,
+                 {
+                 method: "POST",
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({id_reservation:id})
+              }
+
+            )
+            const data = await res.json();
         console.log(`Check-out pour la réservation ${id}`);
+        // console.log(`Check-out pour la réservation ${res.id}`);
+        console.log("Données reçues :", data);
+
+        navigate(`/Services-sejour/${id}/${data.id}`);
     };
 
     return (
@@ -59,7 +84,7 @@ const ReservationSuivi = () => {
                 <SidebarNavClient />
                 <div className="content flex-grow-1 p-4">
                     <h1 className="fs-4 fw-bold mb-4">Suivi des Réservations</h1>
-
+                   {/* <div>{user.nom}</div> */}
                     {error && <p className="text-danger">{error}</p>}
                     {loading && <p>Chargement...</p>}
 

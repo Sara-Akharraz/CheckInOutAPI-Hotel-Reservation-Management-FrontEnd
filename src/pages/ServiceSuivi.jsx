@@ -5,10 +5,11 @@ import '../styles/FactureSuivi.css';
 import '../styles/ajoutService.css';
 import '../styles/bootstrap-tables-only.css';
 import { BiPlusCircle ,BiSolidChevronUpCircle} from "react-icons/bi";
-
+import{ useAuth } from '../components/AuthContext';
 const ServiceSuivi = () => {
   const [reservationId, setReservationId] = useState('');
-  const [userId, setUserId] = useState('');
+  const { user, token } = useAuth();
+  // const [userId, setUserId] = useState('');
   const [services, setServices] = useState([]);
   const [availableServices, setAvailableServices] = useState([]);
   const [showAvailableServices, setShowAvailableServices] = useState(false);
@@ -16,16 +17,24 @@ const ServiceSuivi = () => {
   const [errorMessage, setErrorMessage] = useState('');
   const [message, setMessage] = useState('');
 
-  useEffect(() => {
-    const userIdFromUrl = window.location.pathname.split('/')[2];
-    setUserId(userIdFromUrl);
-  }, []);
+  // useEffect(() => {
+  //   const userIdFromUrl = window.location.pathname.split('/')[2];
+  //   setUserId(userIdFromUrl);
+  // }, []);
 
   const fetchServices = async () => {
-    if (!reservationId || !userId) return;
+    if (!reservationId || !user.id) return;
 
     try {
-      const response = await fetch(`/api/reservation-services/by-reservation/${reservationId}/user/${userId}`);
+      const response = await fetch(`/api/reservation-services/by-reservation/${reservationId}/user/${user.id}`,
+        
+                 {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                  'Content-Type': 'application/json'
+                }
+              }
+      );
       if (!response.ok) {
         if (response.status === 403) {
           setErrorMessage("Vous n'avez pas accès à cette réservation !");
@@ -49,7 +58,14 @@ const ServiceSuivi = () => {
     if (!reservationId) return;
 
     try {
-      const response = await fetch(`/api/reservation-services/available-services/${reservationId}`);
+      const response = await fetch(`/api/reservation-services/available-services/${reservationId}`,
+        {
+             headers: {  Authorization: `Bearer ${token}`,
+                  'Content-Type': 'application/json' }
+        }
+      
+      );
+      
       const data = await response.json();
       setAvailableServices(data);
     } catch (error) {
@@ -68,7 +84,8 @@ const ServiceSuivi = () => {
     try {
       const response = await fetch(`/api/reservation-services/addSejourService?id_reservation=${reservationId}`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {  Authorization: `Bearer ${token}`,
+                  'Content-Type': 'application/json' },
         body: JSON.stringify(selectedServices),
       });
 
@@ -95,13 +112,14 @@ const ServiceSuivi = () => {
   };
 
   return (
+    
     <div className="container">
       <Header />
       <div className="right-side">
         <SidebarNavClient />
         <div className="content flex-grow-1 p-4">
           <h1 className="fs-4 fw-bold mb-4">Suivi des Services</h1>
-
+          <div>{user.id}</div>
           <form onSubmit={handleReservationIdSubmit} className="form mb-4">
             <div>
               <label className="me-2">Numéro de réservation :</label>
